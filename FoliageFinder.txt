@@ -1,0 +1,185 @@
+import bpy
+import os
+import math
+import re
+
+# Path to the txt file and mesh directory
+file_path = r"D:\Users\Admin\Downloads\Character_Default\CultBargain\Scene\txt\StoneMaze_P.txt"
+mesh_dir = r"D:\Users\Admin\Downloads\Character_Default\FModel\Output\Exports\Game\Assets\StaticMeshes\Mesh_Environment"
+
+# Helper function to read the file and extract the necessary information
+def read_file():
+    instances_data = []
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        # Find all occurrences of "PerInstanceSMData"
+        for i, line in enumerate(lines):
+            if '"PerInstanceSMData"' in line:
+                # Look upwards from the current line to find "StaticMesh"
+                mesh_name = None
+                for j in range(i - 1, -1, -1):  # Search upwards in the file
+                    if "StaticMesh'" in lines[j]:
+                        match = re.search(r"StaticMesh'(.*?)'", lines[j])
+                        if match:
+                            mesh_name = match.group(1)
+                            break
+
+                if mesh_name:
+                    # Find all instances of "TransformData" under this "PerInstanceSMData"
+                    transform_data = []
+                    for j in range(i + 1, len(lines)):
+                        if '"TransformData"' in lines[j]:
+                            # Capture the block of transform data
+                            transform_data_block = "\n".join(lines[j:j + 20])  # Assuming each TransformData block is within 20 lines
+                            transform_data.append(transform_data_block)
+                        # Stop once we find a different "PerInstanceSMData"
+                        if '"PerInstanceSMData"' in lines[j]:
+                            break
+                    instances_data.append({
+                        'mesh_name': mesh_name,
+                        'transform_data': transform_data,
+                    })
+    return instances_data
+
+# Function to parse TransformData from the custom format
+def parse_transform_data(text_block):
+    # Regular expressions to extract the needed data from each block
+    translation_pattern = re.compile(r'"Translation":\s*{\s*"X":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Y":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Z":\s*([-+]?[0-9]*\.?[0-9]+)\s*}')
+    rotation_pattern = re.compile(r'"Rotation":\s*{\s*"X":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Y":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Z":\s*([-+]?[0-9]*\.?[0-9]+),\s*"W":\s*([-+]?[0-9]*\.?[0-9]+)')
+    scale_pattern = re.compile(r'"Scale3D":\s*{\s*"X":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Y":\s*([-+]?[0-9]*\.?[0-9]+),\s*"Z":\s*([-+]?[0-9]*\.?[0-9]+)\s*}')
+
+    # Extract data using the patterns
+    translation_match = translation_pattern.search(text_block)
+    rotation_match = rotation_pattern.search(text_block)
+    scale_match = scale_pattern.search(text_block)
+
+    if translation_match and rotation_match and scale_match:
+        translation = (
+            float(translation_match.group(1)) / 100,  # Divide X by 100
+            -float(translation_match.group(2)) / 100,  # Invert Y and divide by 100
+            float(translation_match.group(3)) / 100   # Divide Z by 100
+        )
+        rotation = (
+            float(rotation_match.group(1)),
+            float(rotation_match.group(2)),
+            float(rotation_match.group(3)),
+            -float(rotation_match.group(4))  # Invert W value
+        )
+        scale = (
+            float(scale_match.group(1)),
+            float(scale_match.group(2)),
+            float(scale_match.group(3))
+        )
+        return translation, rotation, scale
+    return None, None, None
+
+# Check if a mesh named "*.mo" exists within 1m of the origin in the scene
+def find_mesh_near_origin(mesh_name):
+    origin = (0, 0, 0)
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH' and obj.name.endswith(".mo"):
+            # Calculate distance to the origin
+            dist = math.sqrt((obj.location.x - origin[0])**2 + (obj.location.y - origin[1])**2 + (obj.location.z - origin[2])**2)
+            if dist <= 1.0 and mesh_name in obj.name:
+                return obj
+    return None
+
+# Action (B): Import missing meshes from the Mesh_Environment directory
+def action_B(mesh_name):
+    print(f"Action B: No corresponding mesh for {mesh_name} found within 1m of origin. Searching for missing mesh...")
+
+    # Loop through all subdirectories and look for the mesh with ".pskx" or ".psk" extension
+    mesh_found = False
+    for root, dirs, files in os.walk(mesh_dir):
+        for file in files:
+            if file.endswith((".pskx", ".psk")) and mesh_name in file:
+                file_path = os.path.join(root, file)
+                print(f"Found mesh: {file_path}. Importing...")
+
+                # Import the mesh using the addon
+                bpy.ops.import_scene.psk(filepath=file_path)
+
+                # After the import, unparent the object if it is parented to an armature
+                imported_object = bpy.context.view_layer.objects.active
+                if imported_object:
+                    if imported_object.parent:
+                        print(f"Removing parent from: {imported_object.name}")
+                        imported_object.parent = None  # This will unparent the object
+                mesh_found = True
+                break
+        if mesh_found:
+            break
+
+    if not mesh_found:
+        print(f"Action B: No matching mesh found for {mesh_name}.")
+
+# Action (A): Create instances based on transform data
+def action_A(mesh_name, transform_data):
+    found_mesh = find_mesh_near_origin(mesh_name)
+
+    # Get or create the 'ImportedMesh' collection
+    imported_mesh_collection = bpy.data.collections.get("ImportedMesh")
+    if not imported_mesh_collection:
+        imported_mesh_collection = bpy.data.collections.new("ImportedMesh")
+        bpy.context.scene.collection.children.link(imported_mesh_collection)
+
+    if found_mesh:
+        # Duplicate the mesh and apply TransformData to each copy
+        for transform_block in transform_data:
+            translation, rotation, scale = parse_transform_data(transform_block)
+
+            if translation and rotation and scale:
+                new_obj = found_mesh.copy()  # Duplicate the mesh
+
+                # Unlink the copied object from all collections
+                for coll in new_obj.users_collection:
+                    coll.objects.unlink(new_obj)
+
+                # Link the new object only to the 'ImportedMesh' collection
+                imported_mesh_collection.objects.link(new_obj)
+
+                # Apply the transforms to the new object
+                new_obj.location = translation
+                new_obj.rotation_mode = 'QUATERNION'
+                new_obj.rotation_quaternion = (rotation[3], rotation[0], rotation[1], rotation[2])
+                new_obj.scale = scale
+
+                print(f"Created instance at location {new_obj.location}, rotation {new_obj.rotation_quaternion}, scale {new_obj.scale}.")
+            else:
+                print(f"Warning: Missing transform data for mesh: {mesh_name}")
+        print(f"Action A: Created {len(transform_data)} instances of {mesh_name}.mo.")
+    else:
+        # No corresponding mesh found within 1m of origin, trigger Action B
+        action_B(mesh_name)
+
+# Action (C): Remove the origin mesh after copying instances
+def action_C(mesh_name):
+    print(f"Action C: Removing the origin mesh for {mesh_name}.mo...")
+
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'MESH' and obj.name.endswith(".mo") and mesh_name in obj.name:
+            print(f"Removing origin mesh: {obj.name}")
+            bpy.data.objects.remove(obj, do_unlink=True)
+
+# Main execution
+def main():
+    instances_data = read_file()
+
+    for data in instances_data:
+        mesh_name = data['mesh_name']
+        transform_data = data['transform_data']
+
+        # Print the mesh name and the number of TransformData instances
+        print(f"Mesh Name: {mesh_name}, Instances of TransformData: {len(transform_data)}")
+
+        # Perform Action B first (import missing meshes), then Action A (copy mesh if found)
+        action_B(mesh_name)  # Import missing meshes first
+        action_A(mesh_name, transform_data)  # Then create instances if mesh is found
+        action_C(mesh_name)  # Remove the origin mesh used for the copies
+
+    # Thank you message at the end
+    print("\nThanks to KOTOB, by Tria but mostly ChatGPT, because I don't know how to code.")
+
+# Run the script
+main()
