@@ -1,6 +1,6 @@
 # Trias-Trashy-Unity-to-blender-importation-automation-for-Project-silverfish
 Some code to help automate the importation areas from the game project silverfish. (THIS CODE DOES NOT IMPORT STUFF FROM UNREAL ENGINE TO BLENDER, it uses another importer to get the job done) 
-I do not know how to upload stuff to github so forgive if this looks bad. Or dont I cant force you to do anything.
+I do not know how to upload stuff to github so forgive if this looks bad. Or dont I cant force you to do anything. This was made with the help of Chat GPT and KOTOB
 
 Also fair warning I wrote most of this amonth apart from itself so it may be slightly outdated. Should still work. 
 =========================================================================================================================
@@ -123,3 +123,5 @@ This code does not import animations, just meshes and armitures, and materials.
 I also plan on makeing a script to add the gui into blender. (the hud)
 
 IF AT ANY POINT YOU WISH TO CLEAR THE LOG USE "Clean consle.txt" SCRIPT. 
+
+Also I used Chat GPT since I dont know how to code. 
