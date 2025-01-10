@@ -1,0 +1,17 @@
+This is for the eye materials.
+
+First select a pre existing material that you want to be your eye mat.
+Run the code, there are 4 images you need to assign into the existing node structure. 
+I would automate this but eh, its like 8 clicks for you to do.
+
+How to use:
+
+The 2 values on the left control were the eyes look, the value in the middle controls the blinking.
+
+The 2 Color wheels are for eye colors, play with them, youll see.
+
+If you want both eyes to be treated sepratly you will have to create a new material and assign it to the eye, I dont know how to have it all in one mat.
+
+If theres anything else, I dont know. Just muck around, if you break it thats ok just rerun the code and it will put it back at before the textures have been added to the mat.
+
+Lastly thanks to KOTOR for the node structure.
