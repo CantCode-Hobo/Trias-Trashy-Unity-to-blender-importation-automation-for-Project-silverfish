@@ -89,6 +89,7 @@ WeightmaptoGround? TOO DO (this will create the ground as it is in game)
 -----------------------------------------------
 Unknown chunk:  ACTRHEAD
 "
+=====THERE MAY BE WEIRDLY PLACED MESH'S AROUND 0,0,0. CHECK THEIR CUBES, IF THE CUBES PLACEMENT IS THE DEFAULT 0,0,0 THEN SOMTHING IS WRONG. If not, then idk. Im testing on Ruinsfeilds_p right now and there is things not in game at 0,0,0 but they do show up in in the files. For this youll have to decide what you wish to keep. Im not sure if this is stuff left over in the files that was disabled or if it has a second placement it should be moved to after. In Ruinsfeilds_p there are 3 of a set boat, but the files ref 6 of them. the other 3 are what will be imported close to the 0,0,0. This leads me to believe that the mesh in that location is leftovers. I will not be adding paramiters to skip such mesh's in case that there is a proper mesh in there. =======================
 -At this point you can use the "matscript" code that will take all the copys of the same materials and turn it into one material.
 ####Set up tryplainar, be simple, have it set to just take color and set scalar to 7.5. and rotation to be 90. OR SET UP A TRIPLANAR THAT EFFECTS WHICH EACH FACE DEPENDING ON WHICH WAY ITS IS FACING.
 ===MaterialFinder=====================================================================
