@@ -30,6 +30,7 @@ Here are some Blender scripts that will automate stuff for ya.
 FoliageFinder.txt			    (Finds all the trees and bush's that are not in scene and imports them.)
 
 FindsMissingMesh.txt  		(this will find missing items like loot nodes and boxs and write them into a txt file. (will not get same stuff as FoliageFinder))
+(will be adding a flag to keep cubes enabled)
 
 ImportsMissingMesh 			  (will read the txt file and import all files inside of it. This will import unnecessary things that you normaly dont see. I have tried to limit these with the list_ignored)
 
@@ -49,7 +50,7 @@ WeightmaptoGround? TOO DO (this will create the ground as it is in game)
 -Rightclick on SilverFish and select "Save Folder's Packeages Properties"		(this will give json files, the scripts need these to find materials and models for importation)
 -If you plan on using one of the maps find the map you want and export as json 	(you will have to add in the filepath manually in my code)
 
-========IF YOU USE umodel_tools USE THIS OPTIONAL PART OF THE GUIDE========
+===IF YOU USE umodel_tools USE THIS OPTIONAL PART OF THE GUIDE========YOU DONT NEED TO USE umodel_tools, I WAS GOING TO USE THIS ORGINALY BUT DIDNT, I KEPT THIS IN HERE IN CASE OF UNFORSEEN CIRCUMSTANCES======== =====
 -In blender, go to addons and find: "umodel_tools.zip" install It. (if you wish to have most of the mesh's imported without my code)
 -Enabled it. Click the little arrow to the left to open up the info about the addon. 
 -Under "Game profiles" click the + And name in "Project SilverFish" 
@@ -104,6 +105,7 @@ WeightmaptoGround? TOO DO (this will create the ground as it is in game)
 Unknown chunk:  ACTRHEAD
 "
 =====THERE MAY BE WEIRDLY PLACED MESH'S AROUND 0,0,0. CHECK THEIR CUBES, IF THE CUBES PLACEMENT IS THE DEFAULT 0,0,0 THEN SOMTHING IS WRONG. If not, then idk. Im testing on Ruinsfeilds_p right now and there is things not in game at 0,0,0 but they do show up in in the files. For this youll have to decide what you wish to keep. Im not sure if this is stuff left over in the files that was disabled or if it has a second placement it should be moved to after. In Ruinsfeilds_p there are 3 of a set boat, but the files ref 6 of them. the other 3 are what will be imported close to the 0,0,0. This leads me to believe that the mesh in that location is leftovers. I will not be adding paramiters to skip such mesh's in case that there is a proper mesh in there. =======================
+
 -At this point you can use the "matscript" code that will take all the copys of the same materials and turn it into one material.
 ####Set up tryplainar, be simple, have it set to just take color and set scalar to 7.5. and rotation to be 90. OR SET UP A TRIPLANAR THAT EFFECTS WHICH EACH FACE DEPENDING ON WHICH WAY ITS IS FACING.
 ===MaterialFinder=====================================================================
