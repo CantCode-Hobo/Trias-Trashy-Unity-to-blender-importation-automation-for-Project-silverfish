@@ -1,0 +1,150 @@
+import bpy
+
+def recreate_node_setup(material):
+    if not material.use_nodes:
+        material.use_nodes = True
+
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+
+    nodes.clear()
+
+    value_node_1 = nodes.new(type="ShaderNodeValue")
+    value_node_1.location = (-1500, 100)
+    value_node_1.outputs[0].default_value = 0.2
+
+    value_node_2 = nodes.new(type="ShaderNodeValue")
+    value_node_2.location = (-1500, 0)
+    value_node_2.outputs[0].default_value = 0.1
+
+    value_node_3 = nodes.new(type="ShaderNodeValue")
+    value_node_3.location = (-100, -150)
+    value_node_3.outputs[0].default_value = 0.1
+
+    combine_xyz_node = nodes.new(type="ShaderNodeCombineXYZ")
+    combine_xyz_node.location = (-1300, 100)
+
+    vector_rotate_node = nodes.new(type="ShaderNodeVectorRotate")
+    vector_rotate_node.location = (-1100, 100)
+
+    texture_coordinate_node = nodes.new(type="ShaderNodeTexCoord")
+    texture_coordinate_node.location = (-1100, 400)
+
+    mapping_node = nodes.new(type="ShaderNodeMapping")
+    mapping_node.location = (-900, 400)
+
+    image_texture_node = nodes.new(type="ShaderNodeTexImage")
+    image_texture_node.location = (-700, 400)
+    image_texture_node.label = "Put Eye_Iris Here"
+
+    mix_1 = nodes.new(type="ShaderNodeMix")
+    mix_1.location = (-400, 400)
+    mix_1.data_type = 'RGBA'
+    mix_1.blend_type = 'MULTIPLY'
+    mix_1.inputs[0].default_value = 1.0
+
+    invert_node = nodes.new(type="ShaderNodeInvert")
+    invert_node.location = (-400, 160)
+
+    rgb_node_1 = nodes.new(type="ShaderNodeRGB")
+    rgb_node_1.location = (-900, 100)
+    rgb_node_1.outputs[0].default_value = (0.005, 0.0, 0.50, 1.0)
+    
+    rgb_node_2 = nodes.new(type="ShaderNodeRGB")
+    rgb_node_2.location = (-600, 0)
+    rgb_node_2.outputs[0].default_value = (0.957, 0.957, 1.0, 1.0)
+
+    image_texture_2_node = nodes.new(type="ShaderNodeTexImage")
+    image_texture_2_node.location = (-600, -200)
+    image_texture_2_node.label = "Put the Eye_Outline here"
+
+    image_texture_3_node = nodes.new(type="ShaderNodeTexImage")
+    image_texture_3_node.location = (-200, 150)
+    image_texture_3_node.label = "Put Eye_closed here"
+
+    image_texture_4_node = nodes.new(type="ShaderNodeTexImage")
+    image_texture_4_node.location = (200, 175)
+    image_texture_4_node.label = "Put T_spherical_normal here"
+    image_texture_4_node.extension = 'CLIP'
+
+    mix_2 = nodes.new(type="ShaderNodeMix")
+    mix_2.location = (-200, 400)
+    mix_2.data_type = 'RGBA'
+    mix_2.blend_type = 'ADD'
+    mix_2.inputs[0].default_value = 1.0
+
+    mix_3 = nodes.new(type="ShaderNodeMix")
+    mix_3.location = (-400, 50)
+    mix_3.data_type = 'RGBA'
+    mix_3.blend_type = 'MULTIPLY'
+    mix_3.inputs[0].default_value = 1.0
+
+    mix_4 = nodes.new(type="ShaderNodeMix")
+    mix_4.location = (200, 400)
+    mix_4.data_type = 'RGBA'
+    mix_4.blend_type = 'MIX'
+    mix_4.inputs[0].default_value = 1.0
+    mix_4.label = "Top Mix Multiply"
+
+    mix_5 = nodes.new(type="ShaderNodeMix")
+    mix_5.location = (200, -100)
+    mix_5.data_type = 'RGBA'
+    mix_5.blend_type = 'MIX'
+    mix_5.inputs[0].default_value = 1.0
+    mix_5.label = "Bottom Mix Multiply"
+
+    final_mix = nodes.new(type="ShaderNodeMix")
+    final_mix.location = (0, 400)
+    final_mix.data_type = 'RGBA'
+    final_mix.blend_type = 'MULTIPLY'
+    final_mix.inputs[0].default_value = 1.0
+
+    principled_bsdf_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_bsdf_node.location = (500, 400)
+    
+    material_output_node = nodes.new(type="ShaderNodeOutputMaterial")
+    material_output_node.location = (750, 400)
+    
+    normal_map_node = nodes.new(type="ShaderNodeNormalMap")
+    normal_map_node.location = (200, -330)
+
+    links.new(value_node_1.outputs[0], combine_xyz_node.inputs[0])
+    links.new(value_node_2.outputs[0], combine_xyz_node.inputs[1])
+    links.new(combine_xyz_node.outputs[0], vector_rotate_node.inputs["Vector"])
+    links.new(vector_rotate_node.outputs["Vector"], mapping_node.inputs["Location"])
+    links.new(texture_coordinate_node.outputs["UV"], mapping_node.inputs["Vector"])
+    links.new(mapping_node.outputs["Vector"], image_texture_node.inputs["Vector"])
+    links.new(image_texture_node.outputs["Color"], mix_1.inputs[6])
+    links.new(image_texture_node.outputs["Alpha"], invert_node.inputs["Color"])
+    links.new(rgb_node_1.outputs[0], mix_1.inputs[7])
+    links.new(invert_node.outputs["Color"], mix_2.inputs[0])
+    links.new(mix_1.outputs[2], mix_2.inputs[6])
+    links.new(rgb_node_2.outputs[0], mix_2.inputs[7])
+    links.new(image_texture_2_node.outputs["Color"], mix_3.inputs[6])
+    links.new(rgb_node_2.outputs[0], mix_3.inputs[7])
+    links.new(mix_2.outputs[2], final_mix.inputs[6])
+    links.new(mix_3.outputs[2], final_mix.inputs[7])
+
+    links.new(image_texture_3_node.outputs["Color"], mix_4.inputs[7])
+    links.new(image_texture_3_node.outputs["Alpha"], mix_5.inputs[6])
+    links.new(value_node_3.outputs[0], mix_4.inputs[0])
+    links.new(value_node_3.outputs[0], mix_5.inputs[0])
+    links.new(image_texture_2_node.outputs["Alpha"], mix_5.inputs[7])
+
+    links.new(final_mix.outputs[2], mix_4.inputs[6])
+
+    links.new(mix_4.outputs[2], principled_bsdf_node.inputs["Base Color"])
+    links.new(image_texture_4_node.outputs["Color"], principled_bsdf_node.inputs["Specular"])
+    links.new(mix_5.outputs[2], principled_bsdf_node.inputs["Alpha"])
+
+    links.new(normal_map_node.outputs["Normal"], principled_bsdf_node.inputs["Normal"])
+
+    links.new(principled_bsdf_node.outputs["BSDF"], material_output_node.inputs["Surface"])
+
+    print(f"Node setup recreated for material '{material.name}'.")
+
+active_material = bpy.context.object.active_material
+if active_material:
+    recreate_node_setup(active_material)
+else:
+    print("No active material found.")
