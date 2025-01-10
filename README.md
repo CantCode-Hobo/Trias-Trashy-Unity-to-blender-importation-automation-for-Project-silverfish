@@ -5,26 +5,40 @@ I do not know how to upload stuff to github so forgive if this looks bad. Or don
 Also fair warning I wrote most of this amonth apart from itself so it may be slightly outdated. Should still work. 
 =========================================================================================================================
 WORKING FOR "Project Silverfish Alpha Demo 0.14.9"
-Tria's bad Little Guide
+Tria's trashy Little Guide
 Things you may need:
+
 Windows 10 (The code that this guide has worked on my computer, which is windows 10, Im not sure it will work for other os's but I hope it does)
+
 Blender 3.6.7 (7-9)(addon says 3.4 but this works)			https://download.blender.org/release/Blender3.6/
+
 Umodel tools (This is a optional Blender addon)								https://github.com/skarndev/umodel_tools/releases/tag/v1.0.4
+
 FModel														https://fmodel.app/download
+
 Project SilverFish											https://store.steampowered.com/app/2941710/Project_Silverfish/ or https://siris-pendrake.itch.io/project-silverfish
+
 The Blender addon io_import_scene_unreal_psa_psk_280.py		https://github.com/Befzz/blender3d_import_psk_psa/blob/master/addons/io_import_scene_unreal_psa_psk_280.py
+
 (some sort of file unpacker ie 7zip) 
 A "mapping file". You can get one from the discord. Needed for Fmodel. I dont know what it does but fmodel needs it to work with the unreal files.
 ------- ------- ------- ------- ------- ------- ------- 
 I DONT KNOW WHY BUT io_import_scene_unreal_psa_psk_280 HAS TO BE REMOVED AND REINSTALLED EVERY TIME YOU CLOSE AND OPEN BLENDER, IF YOU DONT DO THIS NO MESH'S WILL BE IMPORTED.
 ------- ------- ------- ------- ------- ------- ------- 
 Here are some Blender scripts that will automate stuff for ya.
+
 FoliageFinder.txt			    (Finds all the trees and bush's that are not in scene and imports them.)
+
 FindsMissingMesh.txt  		(this will find missing items like loot nodes and boxs and write them into a txt file. (will not get same stuff as FoliageFinder))
+
 ImportsMissingMesh 			  (will read the txt file and import all files inside of it. This will import unnecessary things that you normaly dont see. I have tried to limit these with the list_ignored)
+
 matscript.txt				      (This just removes copied materials) From https://blender.stackexchange.com/questions/75790/how-to-merge-around-300-duplicate-materials
+
 MaterialFinder.txt			  (This imports most textures and will attempt to asign them to its proper mesh, it will not asign the nodes all that well and will stack all image nodes on top of each other.)
+
 Clean consle.txt			    (Cleans your consle, use this if trying to debug and need a clean error log.)		 Frome https://blender.stackexchange.com/questions/190273/can-you-clear-the-system-console-without-restarting-blender
+
 GUICreator??? NOt TODO
 WeightmaptoGround? TOO DO (this will create the ground as it is in game)
 
