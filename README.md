@@ -1,4 +1,4 @@
-# Trias-Trashy-Unity-to-blender-importation-automation-for-Project-silverfish
+# Unrealengine_5_4-to-blender-importation-automation-for-Project-silverfish
 Some code to help automate the importation areas from the game project silverfish. (THIS CODE DOES NOT IMPORT STUFF FROM UNREAL ENGINE TO BLENDER, it uses another importer to get the job done) 
 I do not know how to upload stuff to github so forgive if this looks bad. Or dont I cant force you to do anything. This was made with the help of Chat GPT and KOTOB
 
